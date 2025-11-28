@@ -35,12 +35,13 @@ TELEGRAM_API = f"https://api.telegram.org/bot{BOT_TOKEN}"
 
 # Content sources (RSS + APIs)
 RSS_FEEDS = {
-    "TechCrunch": "https://techcrunch.com/feed/",
-    "HackerNews": "https://hnrss.org/frontpage",
-    "CoinDesk": "https://www.coindesk.com/arc/outboundfeeds/rss/",
-    "Cointelegraph": "https://cointelegraph.com/rss",
-    "GoogleNewsFinance": "https://news.google.com/rss/search?q=stock+market&hl=en-IN&gl=IN&ceid=IN:en"
+    "Tech": "https://techcrunch.com/feed/",
+    "Crypto": "https://cointelegraph.com/rss",
+    "Finance": "https://www.investing.com/rss/news.rss",
+    "AI News": "https://venturebeat.com/category/ai/feed/",
+    "General Knowledge": "https://www.sciencenews.org/feed"
 }
+
 
 ZEN_QUOTES_API = "https://zenquotes.io/api/random"
 RANDOM_FACT_API = "https://uselessfacts.jsph.pl/random.json?language=en"
@@ -279,3 +280,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
