@@ -1,0 +1,60 @@
+name: Scheduled Telegram Poster
+
+on:
+  schedule:
+    # Runs every 2 hours
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write    # allow committing posted_ids.json back
+  id-token: write
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Ensure posted_ids.json exists
+        run: |
+          if [ ! -f posted_ids.json ]; then echo '{"ids":[]}' > posted_ids.json; git add posted_ids.json; git commit -m "chore: add posted_ids.json" || true; fi
+
+      - name: Run poster script
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+        run: |
+          python3 bot_post.py
+
+      - name: Push changes (if any)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # push was attempted by script, but ensure it's pushed
+          git status --porcelain
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.email "actions@github.com"
+            git config user.name "GitHub Actions"
+            git add posted_ids.json || true
+            git commit -m "chore: update posted_ids.json (automation)" || true
+            git push origin HEAD:${GITHUB_REF#refs/heads/} || true
+          else
+            echo "Nothing to push"
+          fi
