@@ -19,7 +19,9 @@ MARKETS = {
     "ETHEREUM": "ETH-USD"
 }
 
-def generate_chart(symbol, name):
+def chart = generate_chart(symbol, name):
+    if chart:
+    send_photo(chart)
     end = datetime.datetime.now()
     start = end - datetime.timedelta(days=2)
 
