@@ -20,18 +20,6 @@ MARKETS = {
     "ETHEREUM": "ETH-USD"
 }
 
-def send_all_charts():
-    for name, symbol in MARKETS.items():
-        filename = f"{name}.png"
-        chart = generate_chart(symbol, filename)
-        if chart:
-            bot.send_photo(CHANNEL_ID, photo=open(chart, "rb"))
-
-
-send_all_charts()
-
-
-
 def generate_chart(symbol, filename):
     end = datetime.now()
     start = end - timedelta(days=7)
@@ -71,3 +59,13 @@ def generate_chart(symbol, filename):
     except Exception as e:
         print(f"❌ Chart generation failed for {symbol}: {e}")
         return None
+
+def send_all_charts():
+    for name, symbol in MARKETS.items():
+        filename = f"{name}.png"
+        chart = generate_chart(symbol, filename)
+        if chart:
+            bot.send_photo(CHANNEL_ID, photo=open(chart, "rb"))
+
+
+send_all_charts()
