@@ -3,6 +3,7 @@ import mplfinance as mpf
 import telegram
 import datetime
 import os
+import pandas as pd
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHANNEL_ID = os.getenv("CHANNEL_ID")
@@ -52,3 +53,33 @@ def send_all_charts():
             )
 
 send_all_charts()
+
+
+
+def generate_chart(symbol, filename):
+    end = datetime.now()
+    start = end - timedelta(days=7)
+
+    data = yf.download(symbol, start=start, end=end, interval="1h")
+
+    # --- FIX: skip empty or invalid data ---
+    if data is None or data.empty:
+        print(f"⚠ Skipping {symbol} - No data received.")
+        return None
+
+    # Drop rows with NaN values
+    data = data.dropna()
+
+    if data.empty:
+        print(f"⚠ Skipping {symbol} - Data contains only NaN.")
+        return None
+    # --------------------------
+
+    # Now safe to plot
+    mpf.plot(data, type='candle', style='yahoo',
+             title=symbol,
+             volume=True,
+             savefig=filename)
+
+    return filename
+
