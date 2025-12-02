@@ -38,25 +38,36 @@ def generate_chart(symbol, filename):
 
     data = yf.download(symbol, start=start, end=end, interval="1h")
 
-    # --- FIX: skip empty or invalid data ---
+    # If empty data — skip
     if data is None or data.empty:
-        print(f"⚠ Skipping {symbol} - No data received.")
+        print(f"⚠ No data for {symbol}. Skipping.")
         return None
 
-    # Drop rows with NaN values
+    # Force all numeric columns to float
+    numeric_cols = ["Open", "High", "Low", "Close", "Adj Close", "Volume"]
+    for col in numeric_cols:
+        if col in data.columns:
+            data[col] = pd.to_numeric(data[col], errors="coerce")
+
+    # Drop all rows with NaN after cleaning
     data = data.dropna()
 
+    # If still empty — skip
     if data.empty:
-        print(f"⚠ Skipping {symbol} - Data contains only NaN.")
+        print(f"⚠ Cleaned data empty for {symbol}. Skipping.")
         return None
-    # --------------------------
 
-    # Now safe to plot
-    mpf.plot(data, type='candle', style='yahoo',
-             title=symbol,
-             volume=True,
-             savefig=filename)
-
-def generate_chart(symbol, filename):
-    end = datetime.datetime.now()
-    start = end - datetime.timedelta(days=7)
+    # Plot safely
+    try:
+        mpf.plot(
+            data,
+            type="candle",
+            style="yahoo",
+            volume=True,
+            title=symbol,
+            savefig=filename
+        )
+        return filename
+    except Exception as e:
+        print(f"❌ Chart generation failed for {symbol}: {e}")
+        return None
