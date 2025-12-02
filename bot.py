@@ -9,8 +9,8 @@ import telegram
 from datetime import datetime, timedelta
 
 # --- Config (read from GitHub Secrets) ---
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-CHANNEL_ID = os.getenv("CHANNEL_ID")
+BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+CHANNEL_ID = os.getenv("TELEGRAM_CHANNEL_ID")
 
 # Quick token check
 if not BOT_TOKEN:
