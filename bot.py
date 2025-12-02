@@ -2,6 +2,7 @@ import yfinance as yf
 import mplfinance as mpf
 import telegram
 import datetime
+from datetime import timedelta
 import os
 import pandas as pd
 
@@ -19,40 +20,13 @@ MARKETS = {
     "ETHEREUM": "ETH-USD"
 }
 
-def chart = generate_chart(symbol, name):
-    if chart:
-    send_photo(chart)
-    end = datetime.datetime.now()
-    start = end - datetime.timedelta(days=2)
-
-    data = yf.download(symbol, start=start, end=end, interval="1h")
-
-    if data.empty:
-        return None
-
-    file_path = f"{name}.png"
-
-    mpf.plot(
-        data,
-        type="candle",
-        style="charles",
-        title=f"{name} – 1H Chart",
-        savefig=file_path
-    )
-
-    return file_path
-
-
 def send_all_charts():
     for name, symbol in MARKETS.items():
-        file = generate_chart(symbol, name)
+        filename = f"{name}.png"
+        chart = generate_chart(symbol, filename)
+        if chart:
+            bot.send_photo(CHANNEL_ID, photo=open(chart, "rb"))
 
-        if file:
-            bot.send_photo(
-                chat_id=CHANNEL_ID,
-                photo=open(file, "rb"),
-                caption=f"{name} Latest Chart 📊"
-            )
 
 send_all_charts()
 
@@ -83,5 +57,6 @@ def generate_chart(symbol, filename):
              volume=True,
              savefig=filename)
 
-    return filename
-
+def generate_chart(symbol, filename):
+    end = datetime.datetime.now()
+    start = end - datetime.timedelta(days=7)
